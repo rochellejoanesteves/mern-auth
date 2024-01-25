@@ -6,7 +6,8 @@ import {
   signInFailure,
 } from "../../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import OAuth from "../../components/header/oauth";
+import OAuth from "../../components/oauth";
+
 
 function SignIn() {
   const [formData, setFormData] = useState({});

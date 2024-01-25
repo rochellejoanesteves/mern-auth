@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import OAuth from "../../components/header/oauth";
+import OAuth from "../../components/oauth";
+
 
 function SignUp() {
   const [formData, setFormData] = useState({});
