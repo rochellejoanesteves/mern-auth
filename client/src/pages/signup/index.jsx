@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -17,7 +18,7 @@ function SignUp() {
     e.preventDefault();
     try {
       setLoading(true);
-      setError(false)
+      setError(false);
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -28,8 +29,9 @@ function SignUp() {
       const data = await response.json();
       setLoading(false);
       if (data.success === false) {
-        return setError(true)
+        return setError(true);
       }
+      navigate('/sign-in')
     } catch (error) {
       setLoading(false);
       setError(true);
@@ -75,7 +77,7 @@ function SignUp() {
 
       <div className="flex gap-2 mt-5">
         <p>Have an account?</p>
-        <Link to="sign-in">
+        <Link to="/sign-in">
           <span className="text-blue-500">Sign in</span>
         </Link>
       </div>
