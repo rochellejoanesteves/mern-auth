@@ -1,19 +1,87 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../../firebase";
 
 function Profile() {
   const { currentUser } = useSelector((state) => state.user);
+  const fileRef = useRef(null);
+  const [image, setImage] = useState(undefined);
+  const [imagePercent, setImagePercent] = useState(0);
+  const [imageError, setError] = useState(false);
+  const [formData, setFormData] = useState({});
 
-  console.log(currentUser);
+  console.log("formData", formData);
+  useEffect(() => {
+    if (image) {
+      handleUpload(image);
+    }
+  }, [image]);
+
+  const handleUpload = async (image) => {
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + image.name;
+
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+
+    uploadTask.on(
+      "state_changed",
+    (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      setImagePercent(Math.round(progress));
+    },
+      (error) => {
+        setError(true);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+          setFormData({
+            ...formData,
+            profilePicture: downloadURL,
+          })
+        );
+      });
+  };
+
+  // NOTE: This is for firebase storage rules for allowing only images can upload
+  // allow read;
+  // allow write: if
+  // request.resource.size < 2 * 1024 * 1024 &&
+  // request.resource.contentType.matches('image/.*')
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7"> Profile </h1>
       <form className="flex flex-col gap-4">
+        <input
+          type="file"
+          ref={fileRef}
+          hidden
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
         <img
           src={currentUser.profilePicture}
           alt="Profile"
           className="h-24 w-24 self-center cursor-pointer rounded-full object-cover mt-2"
+          onClick={() => fileRef.current.click()}
         />
+       <p className="text-sm self-center">
+       {imageError ? (
+          <span className="text-red-700">Error uploading image</span>
+        ) : (
+          imagePercent > 0 && imagePercent < 100 ? (
+            <span>{`Uploading image ${imagePercent}%`}</span>
+          ) : imagePercent === 100 ? (
+            <span className="text-green-700">Image uploaded successfully</span>
+          ) : null
+        )}
+       </p>
         <input
           type="text"
           defaultValue={currentUser.username}
