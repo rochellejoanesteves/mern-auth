@@ -36,7 +36,7 @@ function Profile() {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       setImagePercent(Math.round(progress));
     },
-      (error) => {
+      () => {
         setError(true);
       },
       () => {
@@ -66,14 +66,14 @@ function Profile() {
           onChange={(e) => setImage(e.target.files[0])}
         />
         <img
-          src={currentUser.profilePicture}
+          src={formData.profilePicture || currentUser.profilePicture}
           alt="Profile"
           className="h-24 w-24 self-center cursor-pointer rounded-full object-cover mt-2"
           onClick={() => fileRef.current.click()}
         />
        <p className="text-sm self-center">
        {imageError ? (
-          <span className="text-red-700">Error uploading image</span>
+          <span className="text-red-700">Error uploading image. File size must be less than 2MB only </span>
         ) : (
           imagePercent > 0 && imagePercent < 100 ? (
             <span>{`Uploading image ${imagePercent}%`}</span>
