@@ -13,6 +13,7 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  signOutUser,
 } from "../../redux/user/userSlice.js";
 import { app } from "../../firebase";
 import { async } from "@firebase/util";
@@ -21,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 function Profile() {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const disptach = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const fileRef = useRef(null);
   const [image, setImage] = useState(undefined);
   const [imagePercent, setImagePercent] = useState(0);
@@ -97,9 +98,19 @@ function Profile() {
       });
       const data = res.json();
       disptach(deleteUserSuccess(data));
-      navigate("/sign-in")
+      navigate("/sign-in");
     } catch (error) {
       disptach(deleteUserFailure(error));
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await fetch("/api/auth/signout");
+      disptach(signOutUser());
+      navigate("/sign-in");
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -173,7 +184,9 @@ function Profile() {
         <span className="text-red-700 cursor-pointer" onClick={handleDelete}>
           Delete Account
         </span>
-        <span className="text-red-700 cursor-pointer">Sign Out</span>
+        <span className="text-red-700 cursor-pointer" onClick={handleSignOut}>
+          Sign Out
+        </span>
       </div>
       <p className="text-red-700 mt-5">{error && "Something went wrong!"}</p>
       <p className="text-green-700 mt-5">
