@@ -6,7 +6,9 @@ function Header() {
   const { currentUser } = useSelector((state) => state.user);
 
   return (
-    <div className="bg-slate-200">
+    <div style={{
+      background: "#A367B1"
+    }}>
       <div className="flex justify-between item-center max-w-xl mx-auto p-3">
         <Link to="/">
           <h1 className="font-bold">Auth App</h1>
